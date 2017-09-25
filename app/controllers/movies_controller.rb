@@ -14,12 +14,22 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.acceptable_ratings
     
     if(params[:ratings] != nil )
-      @movies = Movie.where(rating: params[:ratings].keys)
+       @sorting = session[:sort_by]
+       @sorting_col = session[:sort_by]
+       session[:ratings] = params[:ratings]
+      @movies = Movie.order(@sorting).where(rating: params[:ratings].keys)
     else
+      
       @sorting_col = params[:sort_by]
+      session[:sort_by] = params[:sort_by]
       @sorting = params[:sort_by]
-      @movies = Movie.order(@sorting).all
-      #redirect_to movies_path(:sort_by=>@sorting)
+      if(session[:ratings] != nil)
+        @movies = Movie.order(@sorting).where(rating: session[:ratings].keys)
+        redirect_to movies_path(:sort_by=>session[:sort_by], :ratings=>session[:ratings])
+      else
+        @movies = Movie.order(@sorting).all
+      end
+      
     end
     
     
